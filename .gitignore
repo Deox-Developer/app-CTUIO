@@ -1,0 +1,7 @@
+# Ignorar archivos de configuración locales
+config.js
+.env
+
+# Ignorar carpetas generadas por Node.js
+node_modules/
+dist/
