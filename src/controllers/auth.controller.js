@@ -2,8 +2,7 @@ import User from '../models/user.model.js'
 import bcrypt from 'bcryptjs'
 import { createAccesToken } from '../libs/jwt.js'
 
-
-//Funcion que registra usuarios
+// Funcion que registra usuarios
 export const register = async (req, res) => {
     const { email, password, username } = req.body
 
@@ -23,9 +22,7 @@ export const register = async (req, res) => {
 
         res.cookie('token', token)
         res.json({
-            message: "User created successfuly"
-        });
-        res.json({
+            message: "User created successfully",
             id: userSaved.id,
             username: userSaved.username,
             email: userSaved.email,
@@ -34,44 +31,36 @@ export const register = async (req, res) => {
         });
 
     } catch (error) {
-        res.status(500).json({message: error.message})
+        res.status(500).json({ message: error.message });
     }
 };
 
-
-//Funcion que registra usuarios
 export const login = async (req, res) => {
     const { email, password } = req.body
 
     try {
+        const userFound = await User.findOne({ email })
 
-        const userFound =await User.findOne({email})
+        if (!userFound) return res.status(400).json({ message: 'User not found' });
 
-        if (!userFound) return res.status(400).json({message: 'User no found'});
+        // Esto compara la password ingresada con la almacenada en la base de datos
+        const isMatch = await bcrypt.compare(password, userFound.password)
 
-        // Esto desencripta la password
-        const isMatch  = await bcrypt.compare(password, userFound.password)
-
-        if(!isMatch) return res.status(400).json({message: 'Incorrect password '});
-
-        // Guarda los datos recibidos
-        const userSaved = await newUser.save();
+        if (!isMatch) return res.status(400).json({ message: 'Incorrect password' });
 
         const token = await createAccesToken({ id: userFound.id })
 
         res.cookie('token', token)
         res.json({
-            message: "User created successfuly"
-        });
-        res.json({
-            id: userSaved.id,
-            username: userSaved.username,
-            email: userSaved.email,
-            createdAt: userSaved.createdAt,
-            updateAt: userSaved.updatedAt
+            message: "User logged in successfully",
+            id: userFound.id,
+            username: userFound.username,
+            email: userFound.email,
+            createdAt: userFound.createdAt,
+            updateAt: userFound.updatedAt
         });
 
     } catch (error) {
-        res.status(500).json({message: error.message})
+        res.status(500).json({ message: error.message });
     }
 };
