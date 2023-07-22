@@ -34,9 +34,44 @@ export const register = async (req, res) => {
         });
 
     } catch (error) {
-        console.log(error);
+        res.status(500).json({message: error.message})
     }
 };
 
 
-export const login = (req, res) => res.send('login');
+//Funcion que registra usuarios
+export const login = async (req, res) => {
+    const { email, password } = req.body
+
+    try {
+
+        const userFound =await User.findOne({email})
+
+        if (!userFound) return res.status(400).json({message: 'User no found'});
+
+        // Esto desencripta la password
+        const isMatch  = await bcrypt.compare(password, userFound.password)
+
+        if(!isMatch) return res.status(400).json({message: 'Incorrect password '});
+
+        // Guarda los datos recibidos
+        const userSaved = await newUser.save();
+
+        const token = await createAccesToken({ id: userFound.id })
+
+        res.cookie('token', token)
+        res.json({
+            message: "User created successfuly"
+        });
+        res.json({
+            id: userSaved.id,
+            username: userSaved.username,
+            email: userSaved.email,
+            createdAt: userSaved.createdAt,
+            updateAt: userSaved.updatedAt
+        });
+
+    } catch (error) {
+        res.status(500).json({message: error.message})
+    }
+};
