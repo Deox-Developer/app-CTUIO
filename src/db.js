@@ -8,3 +8,4 @@ export const connectDB = async () =>{
         console.log('Ups! Se encotró el siguiente error:',error);
     }
 }
+
