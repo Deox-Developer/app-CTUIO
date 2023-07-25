@@ -1,4 +1,4 @@
-import Jwt, { decode } from 'jsonwebtoken';
+import Jwt from 'jsonwebtoken';
 import { TOKEN_SECRET } from '../config.js'
 
 export const authRequired = (req, res, next) => {
